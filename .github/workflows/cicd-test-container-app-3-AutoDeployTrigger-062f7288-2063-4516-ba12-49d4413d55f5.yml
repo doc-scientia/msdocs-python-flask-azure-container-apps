@@ -1,0 +1,43 @@
+name: Trigger auto deployment for cicd-test-container-app-3
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ main ]
+    paths:
+    - '**'
+    - '.github/workflows/cicd-test-container-app-3-AutoDeployTrigger-062f7288-2063-4516-ba12-49d4413d55f5.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:
+      
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.CICDTESTCONTAINERAPP3_AZURE_CREDENTIALS }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: cicdregistrytest.azurecr.io
+          registryUsername: ${{ secrets.CICDTESTCONTAINERAPP3_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.CICDTESTCONTAINERAPP3_REGISTRY_PASSWORD }}
+          containerAppName: cicd-test-container-app-3
+          resourceGroup: edtech-testing
+          imageToBuild: cicdregistrytest.azurecr.io/cicd-test-container-app-3:${{ github.sha }}
+          
+            
+
+     
+
